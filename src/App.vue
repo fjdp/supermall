@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import mainTabbar from "./components/content/mainTabbar/mainTabbar";
+import mainTabbar from "components/content/mainTabbar/mainTabbar";
 // import Home from "./views/home/Home";
 export default {
   name: "App",
