@@ -50,7 +50,7 @@
 
         // 2.开启定时器
         this.startTimer();
-      }, 3000)
+      }, 100)
     },
     methods: {
 		  /**
@@ -120,7 +120,7 @@
         // 1.获取要操作的元素
         let swiperEl = document.querySelector('.swiper');
         let slidesEls = swiperEl.getElementsByClassName('slide');
-
+        // console.log(slidesEls)
         // 2.保存个数
         this.slideCount = slidesEls.length;
 

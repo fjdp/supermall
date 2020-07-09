@@ -37,12 +37,12 @@ export default {
       click: true
     });
     this.scroll.on("pullingUp", () => {
-      console.log("===");
+      // console.log("===");
       this.scroll.finishPullUp(); //当上拉加载数据加载完毕后，需要调用此方法告诉 better-scroll 数据已加载。
     });
 
     this.scroll.on("scroll", position => {
-      console.log(position);
+      // console.log(position);
     });
   }
 };

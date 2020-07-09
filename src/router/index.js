@@ -10,6 +10,7 @@ const Home = ()=>  import('../views/home/Home')
 const Cart = ()=>  import('../views/cart/Cart')
 const Category = ()=>  import('../views/category/Category')
 const Profile = ()=>  import('../views/profile/Profile')
+const Detail = ()=>  import('../views/detail/Detail')
 
 Vue.use(Router)
 //连续点击路由跳转报错,,看replace还是push
@@ -44,6 +45,10 @@ export default new Router({
       path: '/profile',
       name: 'profile',
       component: Profile
+    },
+    {
+      path: '/detail/:iid',
+      component: Detail
     }
   ]
 })

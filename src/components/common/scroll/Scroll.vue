@@ -15,9 +15,9 @@ export default {
       type: Number,
       default: 1
     },
-    pullUpLoad: {
-      type: Boolean,
-      default: false
+    pullUpLoad:{
+      type:Boolean,
+      default:false
     }
   },
   data() {
@@ -36,7 +36,7 @@ export default {
     });
     this.scroll.on("pullingUp", () => {
       this.$emit("pullingUp");
-      // this.scroll.finishPullUp(); //当上拉加载数据加载完毕后，需要调用此方法告诉 better-scroll 数据已加载。
+      //  this.scroll.finishPullUp(); //当上拉加载数据加载完毕后，需要调用此方法告诉 better-scroll 数据已加载。
     });
 
     this.scroll.on("scroll", position => {
@@ -51,7 +51,13 @@ export default {
       this.scroll && this.scroll.scrollTo && this.scroll.scrollTo(x, y, time);
     },
     finscroll() {
-      this.scroll.finishPullUp();
+      this.scroll && this.scroll.finishPullUp && this.scroll.finishPullUp();
+    },
+    refresh(){
+      this.scroll && this.scroll.refresh && this.scroll.refresh()
+    },
+    getscrollY(){
+      return this.scroll ? this.scroll.y : 0 
     }
   }
 };
