@@ -97,17 +97,15 @@ export default {
     });
   },
   activated: function() {
-    this.$refs.scroll.scrollTo(0,this.saveY)
+    this.$refs.scroll.scrollTo(0,this.saveY,0)
     this.$refs.scroll.refresh()
   },
   deactivated: function() {
     this.saveY = this.$refs.scroll.getscrollY()
-    console.log(this.saveY)
   },
   methods: {
     getHomeMultidata() {
       getHomeMultidata().then(res => {
-        console.log(res);
         this.banners = res.data.banner.list;
         this.recommends = res.data.recommend.list;
       });
