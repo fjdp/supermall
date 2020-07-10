@@ -6,11 +6,11 @@ import Router from 'vue-router'
 // import Category from '../views/category/Category'
 // import Profile from '../views/profile/Profile'
 
-const Home = ()=>  import('../views/home/Home')
-const Cart = ()=>  import('../views/cart/Cart')
-const Category = ()=>  import('../views/category/Category')
-const Profile = ()=>  import('../views/profile/Profile')
-const Detail = ()=>  import('../views/detail/Detail')
+const Home = () => import('../views/home/Home')
+const Cart = () => import('../views/cart/Cart')
+const Category = () => import('../views/category/Category')
+const Profile = () => import('../views/profile/Profile')
+const Detail = () => import('../views/detail/Detail')
 
 Vue.use(Router)
 //连续点击路由跳转报错,,看replace还是push
@@ -19,11 +19,11 @@ Vue.use(Router)
 //    return originalPush.call(this, location).catch(err => err)
 // }
 export default new Router({
-  mode:'history',
+  mode: 'history',
   // linkActiveClass:'active',
   routes: [
     {
-      path:'',
+      path: '',
       redirect: '/home'
     },
     {

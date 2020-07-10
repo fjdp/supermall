@@ -9,8 +9,7 @@
     <div class="info-list">
       <img
         v-for="(item, index) in detailInfo.detailImage[0].list"
-        :src="item"
-        alt
+        :src="'https:'+item"
         :key="index"
         @load="img"
       />
@@ -41,7 +40,6 @@ export default {
   },
   watch: {
     detailInfo() {
-     
       this.imagesLength = this.detailInfo.detailImage[0].list;
     }
   }

@@ -46,7 +46,7 @@ import FeatureView from "./childComps/FeatureView";
 //请求
 import { getHomeMultidata, getHomeGoods } from "network/home";
 import { debounce } from "_common/utils";
-
+import { ItemImgListenerMixin } from "_common/mixin";
 //函数调用 -->  压入函数栈(保存函数调用过程中所有变量)
 //函数调用结束 -->  弹出函数栈(释放函数所有变量)
 export default {
@@ -74,9 +74,10 @@ export default {
       backTopshow: false,
       tabOffsetTop: 0,
       idTabFixed: false,
-      saveY:0
+      saveY: 0,
     };
   },
+    mixins: [ItemImgListenerMixin],
   computed: {
     showGoodsList() {
       return this.goodsList[this.control].list;
@@ -90,18 +91,16 @@ export default {
     this.getHomeGoods("sell");
   },
   mounted() {
-    //图片加载完毕
-    const refresh = debounce(this.$refs.scroll.refresh, 50);
-    this.$bus.$on("itemImageload", () => {
-      return refresh();
-    });
+
   },
   activated: function() {
-    this.$refs.scroll.scrollTo(0,this.saveY,0)
-    this.$refs.scroll.refresh()
+    this.$refs.scroll.scrollTo(0, this.saveY, 0);
+    this.$refs.scroll.refresh();
   },
   deactivated: function() {
-    this.saveY = this.$refs.scroll.getscrollY()
+    this.saveY = this.$refs.scroll.getscrollY();
+    //取消全局事件监听
+    this.$bus.$off("itemImageload", this.ItemImgListener);
   },
   methods: {
     getHomeMultidata() {
@@ -111,12 +110,12 @@ export default {
       });
     },
     getHomeGoods(type) {
-      const page = this.goodsList[type].page + 1
+      const page = this.goodsList[type].page + 1;
       getHomeGoods(type, page).then(res => {
         //数据合并
-        this.goodsList[type].list.push(...res.data.list)
+        this.goodsList[type].list.push(...res.data.list);
         //请求之后页数加一
-        this.goodsList[type].page += 1
+        this.goodsList[type].page += 1;
       });
     },
     hometabClick(index) {
@@ -131,14 +130,14 @@ export default {
           this.control = "sell";
           break;
       }
-      this.$refs.tabcontrol1.currentIndex = index
-      this.$refs.tabcontrol2.currentIndex = index
+      this.$refs.tabcontrol1.currentIndex = index;
+      this.$refs.tabcontrol2.currentIndex = index;
     },
     backTop() {
       this.$refs.scroll.scrollTo(0, 0, 500);
     },
     contentScroll(scroll) {
-      this.backTopshow = scroll.y > -950 ? false : true
+      this.backTopshow = scroll.y > -950 ? false : true;
       this.idTabFixed = -scroll.y > this.tabOffsetTop - 44 ? true : false;
     },
     loadMore() {
@@ -149,7 +148,7 @@ export default {
     swiperimageload() {
       //获取tabcontrol的tabOffsetTop
       //所有组件都有一个属性$el,用于获取组件中的元素
-      this.tabOffsetTop = this.$refs.tabcontrol2.$el.offsetTop
+      this.tabOffsetTop = this.$refs.tabcontrol2.$el.offsetTop;
     }
   }
 };

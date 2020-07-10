@@ -1,6 +1,6 @@
 <template>
   <div id="detail">
-    <detailnavbar class="detail_nav" />
+    <detailnavbar class="detail_nav" @backTop="backTop" />
     <!-- class="content"
       ref="scroll"
       :probe-type="3"
@@ -8,13 +8,14 @@
       :pullUpLoad="true"
     @pullingUp="loadMore"-->
     <scroll class="content" ref="scroll" @scroll="contentScroll" :probe-type="3">
-      <Detailswiper :topImages="topImages"></Detailswiper>
-      <detail-base-info :goods="goods"></detail-base-info>
+      <Detailswiper :topImages="topImages" ref="swiper"></Detailswiper>
+      <detail-base-info :goods="goods" ref="base"></detail-base-info>
       <detail-shop-info :shop="shop"></detail-shop-info>
-      <detail-goods-info :detail-info="detailInfo" @imageLoad="imageLoad"></detail-goods-info>
+      <detail-goods-info :detail-info="detailInfo" @imageLoad="imageLoad" ref="goods"></detail-goods-info>
       <detail-param-info ref="param" :param-info="paramInfo"></detail-param-info>
-      <!-- <detail-comment-info ref="comment" :comment-info="commentInfo"></detail-comment-info>
-      <detail-recommend-info ref="recommend" :recommend-list="recommendList"></detail-recommend-info>-->
+      <detail-comment-info ref="comment" :comment-info="commentInfo"></detail-comment-info>
+      <good-list :goods="recommends" ref="recommend"></good-list>
+      <!-- <detail-recommend-info ref="recommend" :recommend-list="recommendList"></detail-recommend-info> -->
     </scroll>
     <back-top @backTop="backTop" class="back-top" v-show="showBackTop">
       <img src="~assets/img/common/top.png" alt />
@@ -30,13 +31,24 @@ import DetailShopInfo from "./childComps/DetailShopInfo";
 import Scroll from "components/common/scroll/Scroll";
 import DetailGoodsInfo from "./childComps/DetailGoodsInfo";
 
+import goodList from "components/content/goods/goodList";
+
 import backTop from "components/content/backTop/backTop";
 import DetailParamInfo from "./childComps/DetailParamInfo";
-// import DetailCommentInfo from "./childComps/DetailCommentInfo";
+import DetailCommentInfo from "./childComps/DetailCommentInfo";
 // import DetailRecommendInfo from "./childComps/DetailRecommendInfo";
 
-import { getDetail, Goods, Shop, GoodsParam } from "network/detail";
+import {
+  getDetail,
+  Goods,
+  Shop,
+  GoodsParam,
+  getRecommend
+} from "network/detail";
 
+//防抖函数
+import { debounce } from "_common/utils";
+import { ItemImgListenerMixin } from "_common/mixin";
 export default {
   name: "Detail",
   components: {
@@ -47,8 +59,9 @@ export default {
     Scroll,
     DetailGoodsInfo,
     backTop,
-    DetailParamInfo
-    // DetailCommentInfo,
+    DetailParamInfo,
+    DetailCommentInfo,
+    goodList
     // DetailRecommendInfo
   },
   data() {
@@ -59,46 +72,76 @@ export default {
       goods: {},
       shop: {},
       detailInfo: {},
-      paramInfo: {}
+      paramInfo: {},
+      commentInfo: {},
+      recommends: [],
+      tabOffsetTop: 0,
+      themeTops: [],
     };
   },
+  mixins: [ItemImgListenerMixin],
   created() {
+    //判断IOS浏览器
+    this.isSafari =
+      /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
     this.iid = this.$route.params.iid;
-    getDetail(this.iid).then(res => {
-      // 2.1.获取结果
-      const data = res.result;
+    getDetail(this.iid).then(
+      res => {
+        // 2.1.获取结果
+        const data = res.result;
 
-      // 2.2.获取顶部信息
-      this.topImages = data.itemInfo.topImages;
+        // 2.2.获取顶部信息
+        this.topImages = data.itemInfo.topImages;
 
-      // 2.3.获取商品信息
-      this.goods = new Goods(
-        data.itemInfo,
-        data.columns,
-        data.shopInfo.services
-      );
+        // 2.3.获取商品信息
+        this.goods = new Goods(
+          data.itemInfo,
+          data.columns,
+          data.shopInfo.services
+        );
 
-      // 2.4.获取店铺信息
-      this.shop = new Shop(data.shopInfo);
+        // 2.4.获取店铺信息
+        this.shop = new Shop(data.shopInfo);
 
-      // 2.5.获取商品信息
-      this.detailInfo = data.detailInfo;
+        // 2.5.获取商品信息
+        this.detailInfo = data.detailInfo;
 
-      // 2.6.保存参数信息
-      this.paramInfo = new GoodsParam(
-        data.itemParams.info,
-        data.itemParams.rule
-      );
+        // 2.6.保存参数信息
+        this.paramInfo = new GoodsParam(
+          data.itemParams.info,
+          data.itemParams.rule
+        );
 
-      // 2.7.保存评论信息
-      if (data.rate.list) {
-        this.commentInfo = data.rate.list[0];
-      }
-    });
+        // 2.7.保存评论信息
+        if (data.rate.list) {
+          this.commentInfo = data.rate.list[0];
+        }
+      },
+      getRecommend().then((res, error) => {
+        if (error) return;
+        this.recommends = res.data.list;
+      })
+    );
+  },
+  updated() {
+    // 获取需要的四个offsetTop
+    this._getOffsetTops();
   },
   methods: {
-    backTop() {
-      this.$refs.scroll.scrollTo(0, 0, 500);
+    _getOffsetTops() {
+      this.themeTops = [];
+      this.themeTops.push(this.$refs.base.$el.offsetTop);
+      this.themeTops.push(this.$refs.param.$el.offsetTop);
+      this.themeTops.push(this.$refs.comment.$el.offsetTop);
+      this.themeTops.push(this.$refs.recommend.$el.offsetTop);
+      this.themeTops.push(Number.MAX_VALUE);
+    },
+    backTop(index) {
+      console.log("点击");
+      // console.log(this.$refs.goods.$el.offsetTop)
+      this.$refs.scroll.scrollTo(0, -this.themeTops[index], 800);
+      // this.$refs.scroll.scrollTo(0,-this.$refs.goods.$el.offsetTop, 500);
+      // this.$refs.scroll.scrollTo(0, 0, 500);
     },
     contentScroll(scroll) {
       this.showBackTop = scroll.y > -950 ? false : true;
@@ -106,6 +149,11 @@ export default {
     imageLoad() {
       this.$refs.scroll.refresh();
     }
+  },
+  mounted() {},
+  destroyed: function() {
+    //取消全局事件监听
+    this.$bus.$off("itemImageload", this.ItemImgListener);
   }
 };
 </script>
