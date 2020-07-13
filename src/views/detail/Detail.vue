@@ -1,6 +1,6 @@
 <template>
   <div id="detail">
-    <detailnavbar class="detail_nav" @backTop="backTop" />
+    <detailnavbar class="detail_nav" @backTop="backTop" ref="nav" />
     <!-- class="content"
       ref="scroll"
       :probe-type="3"
@@ -17,6 +17,7 @@
       <good-list :goods="recommends" ref="recommend"></good-list>
       <!-- <detail-recommend-info ref="recommend" :recommend-list="recommendList"></detail-recommend-info> -->
     </scroll>
+    <detail-bottom-bar @addToCart="addToCart"></detail-bottom-bar>
     <back-top @backTop="backTop" class="back-top" v-show="showBackTop">
       <img src="~assets/img/common/top.png" alt />
     </back-top>
@@ -36,6 +37,7 @@ import goodList from "components/content/goods/goodList";
 import backTop from "components/content/backTop/backTop";
 import DetailParamInfo from "./childComps/DetailParamInfo";
 import DetailCommentInfo from "./childComps/DetailCommentInfo";
+import DetailBottomBar from "./childComps/DetailBottomBar";
 // import DetailRecommendInfo from "./childComps/DetailRecommendInfo";
 
 import {
@@ -61,7 +63,8 @@ export default {
     backTop,
     DetailParamInfo,
     DetailCommentInfo,
-    goodList
+    goodList,
+    DetailBottomBar
     // DetailRecommendInfo
   },
   data() {
@@ -77,6 +80,8 @@ export default {
       recommends: [],
       tabOffsetTop: 0,
       themeTops: [],
+      iSthemeTops: true,
+      currentIndex: 0
     };
   },
   mixins: [ItemImgListenerMixin],
@@ -128,23 +133,53 @@ export default {
     this._getOffsetTops();
   },
   methods: {
+    addToCart() {
+      // 1.创建对象
+      const obj = {};
+      // 2.对象信息
+      obj.iid = this.iid;
+      obj.imgURL = this.topImages[0];
+      obj.title = this.goods.title;
+      obj.desc = this.goods.desc;
+      obj.newPrice = this.goods.nowPrice;
+      // 3.添加到Store中
+      console.log(obj)
+      this.$store.commit("addCart", obj);
+    },
     _getOffsetTops() {
       this.themeTops = [];
-      this.themeTops.push(this.$refs.base.$el.offsetTop);
+      // console.log(this.$refs.comment.$el.offsetTop)
+      this.themeTops.push(0);
       this.themeTops.push(this.$refs.param.$el.offsetTop);
       this.themeTops.push(this.$refs.comment.$el.offsetTop);
       this.themeTops.push(this.$refs.recommend.$el.offsetTop);
       this.themeTops.push(Number.MAX_VALUE);
     },
     backTop(index) {
-      console.log("点击");
-      // console.log(this.$refs.goods.$el.offsetTop)
-      this.$refs.scroll.scrollTo(0, -this.themeTops[index], 800);
-      // this.$refs.scroll.scrollTo(0,-this.$refs.goods.$el.offsetTop, 500);
-      // this.$refs.scroll.scrollTo(0, 0, 500);
+       this.$refs.scroll.scrollTo(0, 0, 500);
+      if (this.iSthemeTops) {
+        this.$refs.scroll.scrollTo(0, -this.themeTops[index] + 44, 800);
+        this.iSthemeTops = false;
+      } else {
+        this.$refs.scroll.scrollTo(0, -this.themeTops[index], 800);
+      }
     },
     contentScroll(scroll) {
-      this.showBackTop = scroll.y > -950 ? false : true;
+      this.showBackTop = scroll.y < -950;
+      const positionY = -scroll.y;
+      let length = this.themeTops.length;
+      for (let i = 0; i < length - 1; i++) {
+        // if(positionY > this.tnemeTops[i] && positionY < this.tnemeTops[i + 1]){
+        //   console.log(i)
+        // }
+        if (
+          this.currentIndex !== i &&
+          positionY >= this.themeTops[i] && positionY < this.themeTops[i + 1]
+        ) {
+          this.currentIndex = i;
+          this.$refs.nav.currentIndex = this.currentIndex;
+        }
+      }
     },
     imageLoad() {
       this.$refs.scroll.refresh();
@@ -166,7 +201,7 @@ export default {
   background-color: #fff;
 }
 .content {
-  height: calc(100% - 44px);
+  height: calc(100% - 44px - 58px);
 }
 .detail_nav {
   position: relative;
