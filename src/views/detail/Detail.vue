@@ -1,6 +1,7 @@
 <template>
   <div id="detail">
     <detailnavbar class="detail_nav" @backTop="backTop" ref="nav" />
+
     <!-- class="content"
       ref="scroll"
       :probe-type="3"
@@ -21,6 +22,8 @@
     <back-top @backTop="backTop" class="back-top" v-show="showBackTop">
       <img src="~assets/img/common/top.png" alt />
     </back-top>
+    <!-- <toast :message="message" :show="show"/> -->
+
   </div>
 </template>
 
@@ -29,15 +32,17 @@ import detailnavbar from "./childComps/DetailNavBar";
 import Detailswiper from "./childComps/Detailswiper";
 import DetailBaseInfo from "./childComps/DetailBaseInfo";
 import DetailShopInfo from "./childComps/DetailShopInfo";
-import Scroll from "components/common/scroll/Scroll";
-import DetailGoodsInfo from "./childComps/DetailGoodsInfo";
-
-import goodList from "components/content/goods/goodList";
-
-import backTop from "components/content/backTop/backTop";
 import DetailParamInfo from "./childComps/DetailParamInfo";
 import DetailCommentInfo from "./childComps/DetailCommentInfo";
 import DetailBottomBar from "./childComps/DetailBottomBar";
+import DetailGoodsInfo from "./childComps/DetailGoodsInfo";
+
+import Scroll from "components/common/scroll/Scroll";
+// import Toast from 'components/common/toast/Toast'
+
+import goodList from "components/content/goods/goodList";
+import backTop from "components/content/backTop/backTop";
+
 // import DetailRecommendInfo from "./childComps/DetailRecommendInfo";
 
 import {
@@ -64,7 +69,8 @@ export default {
     DetailParamInfo,
     DetailCommentInfo,
     goodList,
-    DetailBottomBar
+    DetailBottomBar,
+    // Toast
     // DetailRecommendInfo
   },
   data() {
@@ -81,7 +87,9 @@ export default {
       tabOffsetTop: 0,
       themeTops: [],
       iSthemeTops: true,
-      currentIndex: 0
+      currentIndex: 0,
+      // message:'',
+      // show:false
     };
   },
   mixins: [ItemImgListenerMixin],
@@ -145,6 +153,13 @@ export default {
       // 3.添加到Store中
       console.log(obj)
       this.$store.commit("addCart", obj);
+      // this.show = true,
+      // this.message = '添加成功'
+      // setTimeout(() => {
+      //     this.show = false
+      // }, 1500);
+      this.$toast.show('添加购物车成功',1500)
+      // this.$toast.show()
     },
     _getOffsetTops() {
       this.themeTops = [];

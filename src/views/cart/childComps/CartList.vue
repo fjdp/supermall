@@ -1,7 +1,7 @@
 <template>
-  <scroll>
+  <scroll class="content">
     <div>
-      <cart-list-item v-for="item in cartList" :key="item.iid" :item-info="item"></cart-list-item>
+      <cart-list-item class="list" v-for="item in cartList" :key="item.iid" :item-info="item"></cart-list-item>
     </div>
   </scroll>
 </template>
@@ -27,5 +27,10 @@
 </script>
 
 <style scoped>
-
+.content{
+  height: 100%;
+}
+.list{
+  height: calc(100% - 44px - 49px);
+}
 </style>

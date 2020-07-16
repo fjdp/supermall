@@ -17,6 +17,7 @@
 		  NavBar,
       CartList,
       BottomBar
+      
     },
     computed: {
 		  cartList() {
